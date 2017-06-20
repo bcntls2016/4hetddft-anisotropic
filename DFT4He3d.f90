@@ -193,9 +193,9 @@ piq    = pi*pi
 !...............................
 !... Read  master-input file ...
 !...............................
-Lambdah = 0.d0
-tzmean   = 0.d0
-tzsurf   = 1.d0
+!Lambdah = 0.d0
+!tzmean   = 0.d0
+!tzsurf   = 1.d0
 
 read(5,nml=input,end=999)
 open(10,file="DFT4He3d.namelist.read")
