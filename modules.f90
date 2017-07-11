@@ -62,7 +62,7 @@ integer (kind=8)              :: pfftbk_1    ! Pointer for FFT bakward
 integer (kind=8)              :: pfftbk_1x   ! Pointer for FFT bakward
 integer (kind=8)              :: pfftbk_2y   ! Pointer for FFT bakward
 integer (kind=8)              :: pfftbk_3z   ! Pointer for FFT bakward
-integer (kind=4)              :: nthread=1   ! Number of threads
+!integer (kind=4)              :: nthread=1   ! Number of threads
 integer (kind=4)              :: npx,npy,npz ! Number of of points (axis)
 real    (kind=8)              :: renor       ! Inverse of (nx*ny*nz)
 end module fftmodule

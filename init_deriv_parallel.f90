@@ -53,7 +53,7 @@ Use Deriv_P
 Implicit Real*8(A-H,O-Z)
 Integer (Kind=4), Intent(in)    :: k,kmax
 Integer (Kind=4), Intent(in)    :: Number_of_Threads
-Logical (Kind=4)   :: OMP_Dynamic_Enable=.true.
+Logical (Kind=4)   :: OMP_Dynamic_Enable=.false.
 Real (Kind=8), Allocatable      :: f(:), Caux(:)
 If(k.Lt.kmax)Then
   Write(0,'(" From Init_deriv_p: k no pot ser mes petit que kmax",2i5)')k,kmax

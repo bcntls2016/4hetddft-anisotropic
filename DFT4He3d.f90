@@ -118,19 +118,14 @@ character  (len=60)  :: filerimp      = 'rimp.out'
 character  (len=60)  :: filevimp      = 'vimp.out'
 character  (len=60)  :: fileaimp      = 'aimp.out'
 character  (len=60)  :: filelambda    = 'lambda.out'
-
 character  (len=60)  :: namefile,namefile1
-
 character  (len=23)  :: curvfile
-character  (len=3)   :: chariter
-
+character  (len=4)   :: chariter
 logical              :: lsurf=.false.        ! include TiO2 surface or not
 logical              :: lsurf3D=.false.        ! include TiO2 surface or not
-
 real       (kind=8)  :: Lambdah,tzmean,tzsurf,rt
-
 integer              :: i
-
+integer (kind=4)	 :: nthread   ! Number of threads
 COMPLEX (kind=8)     :: uim = (0.d0,1.d0)
 
 ! interface
@@ -507,7 +502,8 @@ end select
 !... Prepare plans for FFTWs ...
 !...............................
 write(6,*) '    Initialize Plans for FFT.'
-call fftini(nx,ny,nz)
+!call fftini(nx,ny,nz)
+call fftini(nx,ny,nz,nthread)
 
 !...........................................................
 !... Form  factor for Lennard-Jones and for the impurity ...
