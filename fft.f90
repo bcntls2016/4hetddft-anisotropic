@@ -21,7 +21,7 @@ include 'fftw3.f.include'
 ! allocate(fin(nx,ny,nz)  )
 ! allocate(fout(nx/2+1,ny,nz) )
 
-call dfftw_init_threads(iret)                                                                                                                                 
+call dfftw_init_threads(iret)                                                                                                                             
 Print*, "fftw init threads ",iret
 call dfftw_plan_with_nthreads(nthread)
 Print*, "FFTW Multi-threads with : ",nthread," threads"
