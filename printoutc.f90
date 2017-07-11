@@ -67,7 +67,7 @@ zcm = zcm/xnorm
 !-----------------------------------------------
 !
 if(iprint.lt.0) then
-   open(10,file=namefile,form='UNFORMATTED')
+   open(10,file=namefile,form='UNFORMATTED',BUFFERED='yes')
    write(10) xmax,ymax,zmax,hx,hy,hz,nx,ny,nz
    write(10) rimp
    write(10) vimp
@@ -88,7 +88,7 @@ else
 !               telling you the kind of backup file       ---
 !------------------------------------------------------------
 !
-  open(10,file=namefile,form='FORMATTED')
+  open(10,file=namefile,form='FORMATTED',BUFFERED='yes')
 !   if(limp) then
 !     write(10,1010) iter,paflv,elem
 !   else
