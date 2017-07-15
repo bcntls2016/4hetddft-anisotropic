@@ -120,7 +120,7 @@ character  (len=60)  :: fileaimp      = 'aimp.out'
 character  (len=60)  :: filelambda    = 'lambda.out'
 character  (len=60)  :: namefile,namefile1
 character  (len=23)  :: curvfile
-character  (len=4)   :: chariter
+character  (len=3)   :: chariter
 logical              :: lsurf=.false.        ! include TiO2 surface or not
 logical              :: lsurf3D=.false.        ! include TiO2 surface or not
 real       (kind=8)  :: Lambdah,tzmean,tzsurf,rt
