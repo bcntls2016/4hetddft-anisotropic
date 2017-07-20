@@ -2,8 +2,7 @@
 !...                Subroutine fftini                            ...
 !...................................................................
 
-!subroutine fftini(nx,ny,nz)
-subroutine fftini(nx,ny,nz,nthread)
+subroutine fftini(nx,ny,nz)
 
 use rho
 use lenard4
@@ -13,18 +12,12 @@ use fftmodule  ! fin,fout,fftwplan,pfftfw,pfftbk,nthread,renor,npx,
                ! npy, npz
 implicit none
 
-integer	(kind=4)	:: nx,ny,nz    ! Size of the grid along X, Y and Z axis
-integer	(kind=4)	:: nthread   ! Number of threads
-integer iret
+integer   (kind=4) :: nx,ny,nz    ! Size of the grid along X, Y and Z axis
+
 include 'fftw3.f.include'
 
 ! allocate(fin(nx,ny,nz)  )
 ! allocate(fout(nx/2+1,ny,nz) )
-
-call dfftw_init_threads(iret)                                                                                                                             
-Print*, "fftw init threads ",iret
-call dfftw_plan_with_nthreads(nthread)
-Print*, "FFTW Multi-threads with : ",nthread," threads"
 
 npx   = nx
 npy   = ny

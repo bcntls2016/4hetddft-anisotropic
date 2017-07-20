@@ -53,7 +53,8 @@ Use Deriv_P
 Implicit Real*8(A-H,O-Z)
 Integer (Kind=4), Intent(in)    :: k,kmax
 Integer (Kind=4), Intent(in)    :: Number_of_Threads
-Logical (Kind=4)   :: OMP_Dynamic_Enable=.false.
+Integer (Kind=4), Save   :: Icon_save=-1
+Logical (Kind=4)   :: OMP_Dynamic_Enable=.true.
 Real (Kind=8), Allocatable      :: f(:), Caux(:)
 If(k.Lt.kmax)Then
   Write(0,'(" From Init_deriv_p: k no pot ser mes petit que kmax",2i5)')k,kmax
@@ -110,7 +111,8 @@ If(n.Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
 
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
@@ -209,7 +211,8 @@ If(nn(iv).Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon        
 
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
@@ -391,8 +394,8 @@ If(nn(iv).Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
-
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
     Caux(j+(i-1)*npd)=Cdc(id,i,j)
@@ -665,7 +668,8 @@ If(n.Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
 
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
@@ -764,7 +768,8 @@ If(nn(iv).Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
 
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
@@ -946,7 +951,8 @@ If(nn(iv).Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
 
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
@@ -1220,7 +1226,8 @@ If(n.Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
 
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
@@ -1318,7 +1325,8 @@ If(nn(iv).Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
     Caux(j+(i-1)*npd)=Cdc(id,i,j)
@@ -1422,7 +1430,8 @@ If(nn(iv).Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
     Caux(j+(i-1)*npd)=Cdc(id,i,j)
@@ -1541,7 +1550,8 @@ If(id.Gt.ndmax)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
 
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
@@ -1623,7 +1633,8 @@ If(nn(iv).Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
     Caux(j+(i-1)*npd)=Cdc(id,i,j)
@@ -1727,7 +1738,8 @@ If(nn(iv).Lt.npd)Then
   return
 Endif
 
-If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18)Then
+If(Icon.Ne.0.And.Icon.Ne.8.And.Icon.Ne.18.And.Icon_save.Ne.Icon)Then
+  Icon_save=Icon
   Allocate(Caux(kkp1))
   ForAll(i=1:k,j=1:k)
     Caux(j+(i-1)*npd)=Cdc(id,i,j)

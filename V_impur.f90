@@ -88,8 +88,6 @@ Implicit None
 Logical       :: Lcontrol=.false.        ! Per verificar el funcionament correcte dels nous potencials
 Character (Len=80) :: selec
 Real (Kind=8) :: r, r_cutoff, umax
-Real (Kind=8) :: V_null=0.d0             ! selec='null'    Potencial de interacció nul
-Real (Kind=8) :: V_Ar_He                 ! selec='Ar_He'          Potencial Xe-He Tang & Toennies Z. Phys. D 1, 91-101 (1986)
 Real (Kind=8) :: Au_Graphene             ! selec='Au_Graphene'    Potencial de interacció Au-Graphe
 Real (Kind=8) :: Ag_Graphene             ! selec='Ag_Graphene'    Potencial de interacció Ag-Graphe
 Real (Kind=8) :: dz_Au_Graphene          ! selec='dz_Au_Graphene' Gradient del Potencial de interacció Au-Graphe
@@ -98,9 +96,7 @@ Real (Kind=8) :: V_LJ_OT                 ! selec='LJ_OT'   Potencial de Lenard-J
 Real (Kind=8) :: V_Aziz_He               ! selec='Aziz_He' Potencial de Aziz pel He
 Real (Kind=8) :: V_alka                  ! selec='LI', 'NA', 'K', 'RB' o 'CS' Potencials de Patil
 Real (Kind=8) :: V_He2s_fci              ! selec='He2S_fci', Potencial He(2S) del Eloranta (fci) (5-11-2015), Nist: He(2S): 329179.7623 cm-1
-Real (Kind=8) :: V_Eloranta_He2_plus_gs  ! selec='He_plus', Potencial He2+ de Eloranta (6-6-2016)
 Real (Kind=8) :: V_Koutselos_Cs_plus_gs  ! selec='Cs_plus_Koutselos'
-Real (Kind=8) :: V_Koutselos_K_plus_gs   ! selec='K_plus_Koutselos'
 Real (Kind=8) :: V_Koutselos_Rb_plus_gs  ! selec='Rb_plus_Koutselos'
 Real (Kind=8) :: V_Koutselos_Na_plus_gs  ! selec='Na_plus_Koutselos'
 Real (Kind=8) :: V_Fausto_Rb_plus_gs     ! selec='Rb_plus_Fausto'    New: computed by Fausto
@@ -115,18 +111,10 @@ Real (Kind=8) :: V_Ba_plus_sigma_fixC4   ! selec='Ba_plus_sigma_fix_C4'
 Real (Kind=8) :: V_Ba_plus_2D0           ! selec='Ba_plus_2D0'
 Real (Kind=8) :: V_Ba_plus_2D1           ! selec='Ba_plus_2D1'
 Real (Kind=8) :: V_Ba_plus_2D2           ! selec='Ba_plus_2D2'
-Real (Kind=8) :: V_CH3I_0                ! selec='CH3I_0'
-Real (Kind=8) :: V_CH3I_1                ! selec='CH3I_1'
-Real (Kind=8) :: V_CH3I_2                ! selec='CH3I_2'
-Real (Kind=8) :: V_CH3I_3                ! selec='CH3I_3'
-Real (Kind=8) :: V_CH3I_4                ! selec='CH3I_4'
 Real (Kind=8) :: V_Ag_gs                 ! selec='Ag_gs'
 Real (Kind=8) :: V_Ag_Pi                 ! selec='Ag_Pi'
 Real (Kind=8) :: V_Ag_Sig                ! selec='Ag_Sig'
-Real (Kind=8) :: V_K_4p_Sigma            ! selec='K_4p_Sigma'     Potencial de Pascale
-Real (Kind=8) :: V_K_4p_Pi               ! selec='K_4p_Pi'            "     "     "       
-Real (Kind=8) :: V_K_5s                  ! selec='K_5s'               "     "     "       
-Real (Kind=8) :: V_Cs_7s                 ! selec='Cs_7s'              "     "     "
+Real (Kind=8) :: V_Cs_7s                 ! selec='Cs_7s'          Potencial de Pascale
 Real (Kind=8) :: V_Rb_6s                 ! selec='Rb_6s'              "     "     "
 Real (Kind=8) :: V_Rb_6p_Sigma           ! selec='Rb_6p_sigma'        "     "     "
 Real (Kind=8) :: V_Rb_6p_Pi              ! selec='Rb_6p_pi'           "     "     "
@@ -165,17 +153,6 @@ If(Trim(selec).Eq.'Aziz_He')Then
      Write(6,'("Hem trucat a V_Aziz_He")')
    Endif
    Return
-ElseIf(Trim(selec).Eq.'null')Then
-   If(r.lt.r_cutoff)Then
-     Select_pot = V_null
-   Else
-     Select_pot = V_null
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_null")')
-   Endif
-   Return
 ElseIf(Trim(selec).Eq.'He2S_fci')Then
    If(r.lt.r_cutoff)Then
      Select_pot = umax
@@ -185,17 +162,6 @@ ElseIf(Trim(selec).Eq.'He2S_fci')Then
    If(Lcontrol)Then
      Write(6,'("selec....:",A80)')selec
      Write(6,'("Hem trucat a V_He2s_fci")')
-   Endif
-   Return
-ElseIf(Trim(selec).Eq.'He_plus')Then
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_Eloranta_He2_plus_gs(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_Eloranta_He2_plus_gs")')
    Endif
    Return
 ElseIf(Trim(selec).Eq.'LJ_OT')Then
@@ -261,32 +227,6 @@ ElseIf(Trim(selec).Eq.'Rb_plus_Koutselos')Then
    If(Lcontrol)Then
      Write(6,'("selec....:",A80)')selec
      Write(6,'("Hem trucat a V_Koutselos_Rb_plus_gs")')
-   Endif
-   Return
-ElseIf(Trim(selec).Eq.'Rb_plus_Fausto')Then
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_Fausto_Rb_plus_gs(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_Fausto_Rb_plus_gs")')
-   Endif
-   Return
-ElseIf(Trim(selec).Eq.'K_plus_Koutselos')Then
-!
-!  r_cutoff=1.0d0, 2.0d0
-!  umax=1.8628633412d5, 3.2762532479d3 
-!
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_Koutselos_K_plus_gs(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_Koutselos_K_plus_gs")')
    Endif
    Return
 ElseIf(Trim(selec).Eq.'Rb_plus_Fausto')Then
@@ -564,6 +504,8 @@ ElseIf(Trim(selec).Eq.'Rb_pi')Then
      Write(6,'("Hem trucat a V_Rb_5p_pi")')
    Endif
    Return
+!=================================================
+!=================================================
 ElseIf(Trim(selec).Eq.'Rb_6p_sigma')Then
    If(r.lt.r_cutoff)Then
      Select_pot = umax
@@ -586,6 +528,8 @@ ElseIf(Trim(selec).Eq.'Rb_6p_pi')Then
      Write(6,'("Hem trucat a V_Rb_6p_Pi")')
    Endif
    Return
+!=================================================
+!=================================================
 ElseIf(Trim(selec).Eq.'Rb_gs_Fausto')Then
    If(r.lt.r_cutoff)Then
      Select_pot = umax
@@ -757,7 +701,7 @@ ElseIf(Trim(selec).Eq.'dz_Ag_Graphene')Then
 ElseIf(Trim(selec).Eq.'Xe_He')Then
 !
 !  r_cutoff= 2.0d0
-!  umax= 21450.4867067095d0
+!  umax= -1.0533234197d6
 !
    If(r.lt.r_cutoff)Then
      Select_pot = umax
@@ -767,20 +711,6 @@ ElseIf(Trim(selec).Eq.'Xe_He')Then
    If(Lcontrol)Then
      Write(6,'("selec....:",A80)')selec
      Write(6,'("Hem trucat a V_Xe_He")')
-   Endif
-ElseIf(Trim(selec).Eq.'Ar_He')Then
-!
-!  r_cutoff= 2.0d0
-!  umax= 8.0808095081d3 
-!
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_Ar_He(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_Ar_He")')
    Endif
 ElseIf(Trim(selec).Eq.'Au_Graphene')Then
 !
@@ -809,118 +739,6 @@ ElseIf(Trim(selec).Eq.'dz_Au_Graphene')Then
    If(Lcontrol)Then
      Write(6,'("selec....:",A80)')selec
      Write(6,'("Hem trucat a dz_Au_Grapehene")')
-   Endif
-ElseIf(Trim(selec).Eq.'CH3I_0')Then
-!
-!  r_cutoff= 3.6d0
-!  umax    = 3.1648655845d3
-!
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_CH3I_0(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_CH3I_0(r)")')
-   Endif
-ElseIf(Trim(selec).Eq.'CH3I_1')Then
-!
-!  r_cutoff= 3.6d0
-!  umax    = -5.1115736616d3
-!
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_CH3I_1(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_CH3I_1(r)")')
-   Endif
-ElseIf(Trim(selec).Eq.'CH3I_2')Then
-!
-!  r_cutoff= 3.6d0
-!  umax    = 5.5581502684d3
-!
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_CH3I_2(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_CH3I_2(r)")')
-   Endif
-ElseIf(Trim(selec).Eq.'CH3I_3')Then
-!
-!  r_cutoff= 3.6d0
-!  umax    = -2.7398540818d3
-!
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_CH3I_3(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_CH3I_3(r)")')
-   Endif
-ElseIf(Trim(selec).Eq.'CH3I_4')Then
-!
-!  r_cutoff= 3.6d0
-!  umax    = 2.4025334047d3
-!
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_CH3I_4(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_CH3I_4(r)")')
-   Endif
-ElseIf(Trim(selec).Eq.'K_4p_Sigma')Then
-!
-!  r_cutoff= 2.2d0
-!  umax    = 5.494421d3
-!
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_K_4p_Sigma(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_K_4p_Sigma(r)")')
-   Endif
-ElseIf(Trim(selec).Eq.'K_4p_Pi')Then
-!
-!  r_cutoff= 1.9d0
-!  umax    = 5.348304d3
-!
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_K_4p_Pi(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_K_4p_Pi(r)")')
-   Endif
-ElseIf(Trim(selec).Eq.'K_5s')Then
-!
-!  r_cutoff= 2.d0
-!  umax    = 2.729808d3
-!
-   If(r.lt.r_cutoff)Then
-     Select_pot = umax
-   Else
-     Select_pot = V_K_5s(r)
-   Endif
-   If(Lcontrol)Then
-     Write(6,'("selec....:",A80)')selec
-     Write(6,'("Hem trucat a V_K_5s(r)")')
    Endif
 Else
    Write(6,'(A,": aquest potencial no està definit, de part de: Selec_Pot")')Trim(Selec)
@@ -1561,9 +1379,6 @@ EndDo
 V_Ba_plus_pi_fixC4=Sto
 Return
 End
-!
-! Adjust of Ba+ 2P sigma (from Fausto calculations)
-!
 Block Data Inicio_LJ_V_Ba_plus_sigma
 Implicit Real*8(A-H,O-Z)
 Parameter(Npg=13)
@@ -1571,23 +1386,23 @@ Real*16 Pg
 Integer*4 k0
 Common/Param_LJ_V_Ba_plus_sigma/rcutoff,fcutoff,r0,aa,bb,cc,Pg(Npg),k0
 Data Pg/                           &
- -1946800.56568338068309116827100120Q0,  160853137.584288414167976754320470Q0, -5443802098.75045627541231247577964Q0,  &
-  101026984958.806322366443362695122Q0, -1156732968598.98543549109440671187Q0,  8665994393409.78419887735371608207Q0,  &
- -43862571678823.8062435100392360317Q0,  152374645410796.393876923253474426Q0, -363469581548844.057191969295126660Q0,  &
-  584580735231448.559942865666177553Q0, -605026417604047.637639655063714044Q0,  363284554181176.601081977921602535Q0,  &
- -95975010650140.9085581326839809273Q0/ 
-Data rcutoff/ 1.5000000000000000D+00/
-Data fcutoff/ 2.2626640000000000D+07/
-Data r0/ 1.0000000000000000D+00/
-Data aa/ 1.5500784610027036D+04/
-Data bb/-9.5332029461583734D+04/
-Data cc/ 1.5198462687793490D+05/
+ -155453.827691961623461282024409954Q0,  0.00000000000000000000000000000000Q0,  609660746.012023870709073764033720Q0,  &
+ -27012355773.8354869147111438133770Q0,  547977852147.213384120125030199681Q0, -6379515962042.38070056366175618931Q0,  &
+  45783198165473.0212398301055733783Q0, -204555842921779.552403271049190992Q0,  538639980218602.251536683625822765Q0,  &
+ -645615536709882.599491520018741585Q0, -357150565458048.205847284095868578Q0,  1939078060434834.05660740333871465Q0,  &
+ -1617365878021944.65651143709701361Q0/ 
+Data rcutoff/ 1.0000000000000000D+00/
+Data fcutoff/ 2.0367639999999999D+04/
+Data r0/ 3.5000000000000000D+00/
+Data aa/ 1.4458271228008462D+03/
+Data bb/-1.3763611878981985D+04/
+Data cc/ 3.3225527324337971D+04/
 Data k0/   3/
 End
 Double Precision Function V_Ba_plus_sigma(x)
 Parameter(Npg=13)
 Implicit Real*8(A-H,O-Z)
-Real*16 Pg,Sto,xq,Aux
+Real*16 Pg,Sto,xq
 Integer*4 k0
 Common/Param_LJ_V_Ba_plus_sigma/rcutoff,fcutoff,r0,aa,bb,cc,Pg(Npg),k0
 If(x.le.rcutoff)Then
@@ -1600,10 +1415,8 @@ If(x.le.r0)Then
 Endif
 Sto=0.0q0
 xq=1.0q0/x
-Aux=xq**(k0+1)
 Do k=1,Npg
-  Sto=Sto+pg(k)*Aux
-  Aux=Aux*xq
+  Sto=Sto+pg(k)*xq**(k+k0)
 EndDo
 V_Ba_plus_sigma=Sto
 Return
@@ -1834,50 +1647,6 @@ End
       Endif
       V_Koutselos_Rb_plus_gs=Sto*Hartree*eV_k
       End Function V_Koutselos_Rb_plus_gs
-      Double Precision Function V_Koutselos_K_plus_gs(xx)
-!
-!                     xx: Entrada en Angs.
-! V_Koutselos_Rb_plus_gs: Salida en K
-!
-      Implicit none
-      Real  (Kind=8)  :: aux,sto,x2,x4,x6,x8,CC4,CC6,CC8
-      Real  (Kind=8)  :: xx,x,h_r,Rs,V_ex
-!
-!     Ctes para convertir de Angs. a bohr y de atomicas a K
-!
-      Real  (Kind=8)  :: a_bohr=0.529177d0, Hartree=27.2114d0, eV_K=11604.448d0
-!
-! Parametros adimensionales para los potenciales iones alkalinos-gas noble
-!
-      Real  (Kind=8)  :: A=146.98d0, a_a=1.5024d0, B=70.198d0, b_b=1.4041d0
-!
-! Los parametors estan en unidades atomicas
-!
-
-! Empiezan los parametros para el He-Rb+
-      Real  (Kind=8)  :: v_0=0.2690d0, rho=0.8589d0, R_m=5.49d0
-      Real  (Kind=8)  :: C4=0.0d0, C6=5.83d0, C8=72.05d0
-      Real  (Kind=8)  :: a_d=1.3831d0, a_q=2.4434d0, a_o=10.614d0
-! Acaban los parametros para el Rb+
-
-      CC4 = C4 + a_d/2.0d0; CC6 = C6 + a_q/2.0d0; CC8 =C8 + a_o/2.0d0
-      x=xx/a_bohr  ! Transformem els Angs en unitats atòmiques de llongitut
-      Rs=x/rho     
-      V_ex=v_0*(A*Dexp(-a_a*Rs) - B*Dexp(-b_b*Rs))
-      Aux=R_m*1.28d0
-      If(x.Ge.Aux)Then
-        h_r=1.0d0
-      Else
-        h_r=0.0d0
-        If(x.Ne.0.0d0)h_r=Dexp(-(Aux/x - 1.d0)**2)
-      Endif
-      Sto=V_ex
-      If(x.Ne.0.0d0)Then
-        x2=x*x; x4=x2*x2; x6=x4*x2; x8=x6*x2
-        Sto = Sto + (-CC4/x4 -CC6/x6 -CC8/x8)*h_r
-      Endif
-      V_Koutselos_K_plus_gs=Sto*Hartree*eV_k
-      End Function V_Koutselos_K_plus_gs
 Block Data Inicio_LJ_Rb_6s
 Implicit Real*8(A-H,O-Z)
 Parameter(Npg=11)
@@ -2670,57 +2439,6 @@ V_Pascale_Rb_6p1=Sto
 Return
 End
 !
-!  Funcio que calcula el potencial Ar-He, entrada \AA, sortida K
-!
-!  r_cutoff = 2.0d0; umax = 8.0808095081d3
-!
-!
-Double precision function V_Ar_He(r)
-Implicit none
-real      (kind=8) :: AA     = 75.8953D0
-real      (kind=8) :: BB     = 2.0589D0
-real      (kind=8) :: C6     = 9.7697D0
-real      (kind=8) :: C8     = 152.8468D0
-real      (kind=8) :: C10    = 3249.728D0 
-real      (kind=8) :: rbohr  = 0.5292d0
-real      (kind=8) :: Hartree_to_K  = 27.21d0*11604.d0
-real (kind=8) :: r, rr, Stoe, Stor, Sto1, Aux
-real (kind=8) :: B(18), C(7), S(18)
-Logical  :: Lfirst = .true.
-Integer (Kind=4) :: i, kmax
-Save     :: Lfirst, C, B
-If(Lfirst)Then
-!  Write(6,'("Control per veure si nomes hi pasem una vegada")')
-  B(1) = BB
-  Do i=2, 18
-    B(i) = B(i-1)*BB/Dfloat(i)
-  EndDo
-  C(1) = C6; C(2) = C8; C(3) = C10
-  Do i=4, 7
-    C(i) = (C(i-1)/C(i-2))**3*C(i-3)
-  EndDo
-  Lfirst = .false.
-Endif
-rr = r/rbohr
-Stoe = Exp(-BB*rr)
-Stor = rr
-S(1) = B(1)*Stor
-Do i=2, 18
-  Stor = Stor*rr
-  S(i) = S(i-1) + b(i)*Stor
-Enddo
-Aux = Aa*Stoe
-Sto1 = 1.0d0/rr**2
-Stor = Sto1**3
-Do i = 1, 7
-  kmax = 2*i + 4
-  Aux = Aux + ( (S(kmax)+1.0d0)*Stoe - 1.0d0 )*C(i)*Stor
-  Stor = Stor*Sto1
-EndDo
-V_Ar_He = Aux*Hartree_to_K
-Return
-End
-!
 !  Funcio que calcula el potencial Xe-He, entrada \AA, sortida K
 !
 !  r_cutoff = 2.0d0; umax = 21450.4867067095d0
@@ -3022,340 +2740,6 @@ Data xmeV_To_K/11.604448d0/, A/448058.D0/, beta/2.12336D0/, C4/83077.3D0/
 dz_Au_Graphene=(-A*beta*dexp(-beta*z) + 4.d0*C4/z**5)*xmeV_To_K
 Return      
 End
-!
-! Function for He-He+ potential, from Jussi Eloranta (6/6/2016)
-!
-Block Data Inicio_LJ_V_Eloranta_He2_plus_gs
-Implicit Real*8(A-H,O-Z)
-Parameter(Npg=17)
-Real*16 Pg
-Integer*4 k0
-Common/Param_LJ_V_Eloranta_He2_plus_gs/rcutoff,fcutoff,r0,aa,bb,cc,Pg(Npg),k0
-Data Pg/                           &
- -17123.9045474000000000000000000000Q0,  588108.342377894438906335100185956Q0, -12708070.5256971354232632580211002Q0,  &
-  46593490.4538337953748571219487504Q0,  903614394.043264050274603032772751Q0, -11755047059.0947744782716618472676Q0,  &
-  66544986310.3971244712772558577499Q0, -230023812497.692645654143106555337Q0,  540723165541.193441108405864043649Q0,  &
- -908192814328.760315407843038697665Q0,  1115091165095.81869466120443671210Q0, -1006768340907.62729321655030853465Q0,  &
-  662532608654.360730944885641242397Q0, -309620499229.935417801050724076383Q0,  97461010879.4325864938071757129741Q0,  &
- -18542204834.6544171733101740365183Q0,  1611683836.74445477113707981227279Q0/ 
-Data rcutoff/ 5.2917700000000001D-01/
-Data fcutoff/ 1.1804110000000001D+04/
-Data r0/ 7.3999999999999999D-01/
-Data aa/-3.9258895086799792D+04/
-Data bb/ 0.0000000000000000D+00/
-Data cc/ 2.2797707492869155D+04/
-Data k0/   3/
-End
-Double Precision Function V_Eloranta_He2_plus_gs(x)
-Parameter(Npg=17)
-Implicit Real*8(A-H,O-Z)
-Real*16 Pg,Sto,xq,Aux
-Integer*4 k0
-Common/Param_LJ_V_Eloranta_He2_plus_gs/rcutoff,fcutoff,r0,aa,bb,cc,Pg(Npg),k0
-If(x.le.rcutoff)Then
-  V_Eloranta_He2_plus_gs=fcutoff
-  Return
-Endif
-If(x.le.r0)Then
-  V_Eloranta_He2_plus_gs=Abs(aa*x**2+bb*x+cc)
-  Return
-Endif
-Sto=0.0q0
-xq=1.0q0/x
-Aux=xq**(k0+1)
-Do k=1,Npg
-  Sto=Sto+pg(k)*Aux
-  Aux=Aux*xq
-EndDo
-V_Eloranta_He2_plus_gs=Sto
-Return
-End
-!
-!  Potencial de la molecula CH3I con lambda=0
-! 
-double precision function V_CH3I_0(r)
-implicit none
-Real (kind=8) :: Radpot, r, r_au, r_cutoff=3.6d0,  umax=3.1648655845d3
-!
-!     Ctes para convertir de Angs. a bohr y de atomicas a K
-!
-      Real  (Kind=8)  :: a_bohr=0.529177d0, Hartree=27.2114d0, eV_K=11604.448d0
-If(r.Le.r_cutoff)Then
-  V_CH3I_0 = Umax
-Else      
-  r_au     = r/a_bohr      
-  V_CH3I_0 = Radpot(0,r_au)*Hartree*eV_K
-EndIf
-Return
-end function
-!
-!  Potencial de la molecula CH3I con lambda=1
-! 
-double precision function V_CH3I_1(r)
-implicit none
-Real (kind=8) :: Radpot, r, r_au, r_cutoff=3.6, umax=-5.1115736616d3
-!
-!     Ctes para convertir de Angs. a bohr y de atomicas a K
-!
-      Real  (Kind=8)  :: a_bohr=0.529177d0, Hartree=27.2114d0, eV_K=11604.448d0
-If(r.Le.r_cutoff)Then
-  V_CH3I_1 = Umax
-Else      
-  r_au     = r/a_bohr      
-  V_CH3I_1 = Radpot(1,r_au)*Hartree*eV_K
-EndIf
-Return
-end function
-!
-!  Potencial de la molecula CH3I con lambda=2
-! 
-double precision function V_CH3I_2(r)
-implicit none
-Real (kind=8) :: Radpot, r, r_au, r_cutoff=3.6d0, umax=5.5581502684d3
-!
-!     Ctes para convertir de Angs. a bohr y de atomicas a K
-!
-      Real  (Kind=8)  :: a_bohr=0.529177d0, Hartree=27.2114d0, eV_K=11604.448d0
-If(r.Le.r_cutoff)Then
-  V_CH3I_2 = Umax
-Else      
-  r_au     = r/a_bohr      
-  V_CH3I_2 = Radpot(2,r_au)*Hartree*eV_K
-EndIf
-Return
-end function
-!
-!  Potencial de la molecula CH3I con lambda=3
-! 
-double precision function V_CH3I_3(r)
-implicit none
-Real (kind=8) :: Radpot, r, r_au, r_cutoff=3.6d0, umax=-2.7398540818d3
-!
-!     Ctes para convertir de Angs. a bohr y de atomicas a K
-!
-      Real  (Kind=8)  :: a_bohr=0.529177d0, Hartree=27.2114d0, eV_K=11604.448d0
-If(r.Le.r_cutoff)Then
-  V_CH3I_3 = Umax
-Else      
-  r_au     = r/a_bohr      
-  V_CH3I_3 = Radpot(3,r_au)*Hartree*eV_K
-EndIf
-Return
-end function
-!
-!  Potencial de la molecula CH3I con lambda=4
-! 
-double precision function V_CH3I_4(r)
-implicit none
-Real (kind=8) :: Radpot, r, r_au, r_cutoff=3.6, umax=2.4025334047d3
-!
-!     Ctes para convertir de Angs. a bohr y de atomicas a K
-!
-      Real  (Kind=8)  :: a_bohr=0.529177d0, Hartree=27.2114d0, eV_K=11604.448d0
-If(r.Le.r_cutoff)Then
-  V_CH3I_4 = Umax
-Else      
-  r_au     = r/a_bohr      
-  V_CH3I_4 = Radpot(4,r_au)*Hartree*eV_K
-EndIf
-Return
-end function
-      function radpot(l,r)
-      implicit none
-!
-!     the He-CH3I interaction potential iin grd state, only m=0
-!
-
-
-      integer l
-      real*8  radpot,r
-
-      real*8  d,b,c
-
-
-      select case (l) 
-
-!  fort.50 2:3
-      case (0)
-      d               = 0.000185445   !  +/- 2.003e-06    (1.08%)
-      b               = 0.782913      !  +/- 0.005996     (0.7659%)
-      c               = 9.5243        !  +/- 0.01072      (0.1125%)
-
-!  fort.50 2:4
-      case (1)
-      d               = -4.51657e-05  !  +/- 5.099e-07    (1.129%)
-      b               = 0.837569      !  +/- 0.004355     (0.52%)
-      c               = 10.3772       !  +/- 0.007319     (0.07053%)
-
-!  fort.50 2:5
-      case (2)
-      d               = 2.53688e-05   !  +/- 2.933e-07    (1.156%)
-      b               = 0.849398      !  +/- 0.002787     (0.3281%)
-      c               = 10.6988       !  +/- 0.004548     (0.04251%)
-
-!  fort.50 2:6
-      case (3)
-      d               = -6.51825e-06  !  +/- 4.938e-08    (0.7576%)
-      b               = 0.779254      !  +/- 0.0061       (0.7828%)
-      c               = 11.454        !  +/- 0.007429     (0.06486%)
-
-!  fort.50 2:7
-      case (4)
-      d               = 1.5032e-06    !  +/- 2.002e-08    (1.332%)
-      b               = 0.787553      !  +/- 0.0054       (0.6856%)
-      c               = 12.236        !  +/- 0.01018      (0.08318%)
-
-      case default
-      stop 'in radpot: l out of range'
-      end select
-
-!     Morse function
-      radpot=d*(1.d0-dexp(-b*(r-c)))**2-d
-
-      return 
-      end
-!
-! Function for He-K(4p_Sigma), From Pascale data potential
-!
-Block Data Inicio_LJ_V_K_4p_Sigma
-Implicit Real*8(A-H,O-Z)
-Parameter(Npg=18)
-Real*16 Pg
-Integer*4 k0
-Common/Param_LJ_V_K_4p_Sigma/rcutoff,fcutoff,r0,aa,bb,cc,Pg(Npg),k0
-Data Pg/                           &
-  123270229.922828519094376988757267Q0, -12085480784.0001990705905344017368Q0,  493376520440.846742309241896876082Q0,  &
- -11130615786861.2195078000310223820Q0,  155081464596787.947785296266388633Q0, -1423219373370643.41282606175556080Q0,  &
-  8982444221608931.65773550693292715Q0, -40017473420474543.0863116482077444Q0,  127156098740259262.973889637297298Q0,  &
- -286289630234854071.709781745781639Q0,  443029672222162513.944773691873259Q0, -435778229290691161.879891464441776Q0,  &
-  216297197302294980.110743898796384Q0, -1493759170257458.23144984879814468Q0,  3521195510768782.35743497581930372Q0,  &
- -105695005528937470.204215869914495Q0,  101576258377617829.001630054279239Q0, -30021724906855482.6250169475416685Q0/ 
-Data rcutoff/ 2.2000000000000002D+00/
-Data fcutoff/ 5.4944210000000003D+03/
-Data r0/-2.0000000000000000D+00/
-Data aa/-1.1846279611402621D+13/
-Data bb/ 2.7476162593191215D+13/
-Data cc/-1.5810332386853908D+13/
-Data k0/   5/
-End
-Double Precision Function V_K_4p_Sigma(x)
-Parameter(Npg=18)
-Implicit Real*8(A-H,O-Z)
-Real*16 Pg,Sto,xq,Aux
-Integer*4 k0
-Common/Param_LJ_V_K_4p_Sigma/rcutoff,fcutoff,r0,aa,bb,cc,Pg(Npg),k0
-If(x.le.rcutoff)Then
-  V_K_4p_Sigma=fcutoff
-  Return
-Endif
-If(x.le.r0)Then
-  V_K_4p_Sigma=Abs(aa*x**2+bb*x+cc)
-  Return
-Endif
-Sto=0.0q0
-xq=1.0q0/x
-Aux=xq**(k0+1)
-Do k=1,Npg
-  Sto=Sto+pg(k)*Aux
-  Aux=Aux*xq
-EndDo
-V_K_4p_Sigma=Sto
-Return
-End
-!
-! Function for He-K(4p_Pi), From Pascale data potential
-!
-Block Data Inicio_LJ_V_K_4p_Pi
-Implicit Real*8(A-H,O-Z)
-Parameter(Npg=18)
-Real*16 Pg
-Integer*4 k0
-Common/Param_LJ_V_K_4p_Pi/rcutoff,fcutoff,r0,aa,bb,cc,Pg(Npg),k0
-Data Pg/                           &
-  7463823.30565045302747409754900998Q0, -718023677.708100048067350320776803Q0,  28527955672.4973076800039235370599Q0,  &
- -649780615925.820487084894875824681Q0,  9494248151960.38025074812833414839Q0, -95423287484468.9225481965073472623Q0,  &
-  688611363436857.181033088432509010Q0, -3659192698303041.57349366577052330Q0,  14504208321803535.5304968565259890Q0,  &
- -43002303720081040.5938560703278609Q0,  94613503021063793.2518086792502445Q0, -151026197668471021.305996587780281Q0,  &
-  166277977852662387.539989377379199Q0, -110888302469029095.889154928172435Q0,  22770818008615233.2321789074210083Q0,  &
-  27284389361289459.6643521776459617Q0, -23355843002431104.0076310950131271Q0,  5879948233732488.71454983137084160Q0/ 
-Data rcutoff/ 1.8999999999999999D+00/
-Data fcutoff/ 5.3483040000000001D+03/
-Data r0/-2.0000000000000000D+00/
-Data aa/ 9.6643483830893945D+11/
-Data bb/-2.2413727796818149D+12/
-Data cc/ 1.2896495964123530D+12/
-Data k0/   5/
-End
-Double Precision Function V_K_4p_Pi(x)
-Parameter(Npg=18)
-Implicit Real*8(A-H,O-Z)
-Real*16 Pg,Sto,xq,Aux
-Integer*4 k0
-Common/Param_LJ_V_K_4p_Pi/rcutoff,fcutoff,r0,aa,bb,cc,Pg(Npg),k0
-If(x.le.rcutoff)Then
-  V_K_4p_Pi=fcutoff
-  Return
-Endif
-If(x.le.r0)Then
-  V_K_4p_Pi=Abs(aa*x**2+bb*x+cc)
-  Return
-Endif
-Sto=0.0q0
-xq=1.0q0/x
-Aux=xq**(k0+1)
-Do k=1,Npg
-  Sto=Sto+pg(k)*Aux
-  Aux=Aux*xq
-EndDo
-V_K_4p_Pi=Sto
-Return
-End
-!
-! Function for He-K(5s), From Pascale data potential
-!
-Block Data Inicio_LJ_V_K_5s
-Implicit Real*8(A-H,O-Z)
-Parameter(Npg=20)
-Real*16 Pg
-Integer*4 k0
-Common/Param_LJ_V_K_5s/rcutoff,fcutoff,r0,aa,bb,cc,Pg(Npg),k0
-Data Pg/                           &
-  22013374032.6756992466989907471231Q0, -2607473486972.96115845928542359422Q0,  137278559465513.504318508804350585Q0,  &
- -4284085369698061.73976060584229719Q0,  89194755667933302.9197442829881481Q0, -1322401314191165810.56518310532255Q0,  &
-  14549200062430442236.7345712007885Q0, -122132199482850453201.933729576988Q0,  797237288979113873142.546850234427Q0,  &
- -4098091530865115675119.54131140732Q0,  16712660424005787663159.1277264440Q0, -54228388406852069443691.0811371931Q0,  &
-  139769338235053275092644.042876545Q0, -284264086314955716327432.688486366Q0,  450393287366663046416997.448177291Q0,  &
- -544150565669437497681315.135493803Q0,  484098752094243106107299.506791578Q0, -298854633397265157385967.162411014Q0,  &
-  114324971752633317584036.132040739Q0, -20408914798270344038969.9560381946Q0/ 
-Data rcutoff/ 2.0000000000000000D+00/
-Data fcutoff/ 2.7298080000000000D+03/
-Data r0/-2.0000000000000000D+00/
-Data aa/-1.1118034495930548D+05/
-Data bb/ 4.7153152909318462D+05/
-Data cc/-4.9833086495060596D+05/
-Data k0/   5/
-End
-Double Precision Function V_K_5s(x)
-Parameter(Npg=20)
-Implicit Real*8(A-H,O-Z)
-Real*16 Pg,Sto,xq,Aux
-Integer*4 k0
-Common/Param_LJ_V_K_5s/rcutoff,fcutoff,r0,aa,bb,cc,Pg(Npg),k0
-If(x.le.rcutoff)Then
-  V_K_5s=fcutoff
-  Return
-Endif
-If(x.le.r0)Then
-  V_K_5s=Abs(aa*x**2+bb*x+cc)
-  Return
-Endif
-Sto=0.0q0
-xq=1.0q0/x
-Aux=xq**(k0+1)
-Do k=1,Npg
-  Sto=Sto+pg(k)*Aux
-  Aux=Aux*xq
-EndDo
-V_K_5s=Sto
-Return
-End
+      
+      
+     

@@ -24,6 +24,7 @@ program DFT4HeImpd
 ! (LE FALTA: Ficheros binarios)
 !-----------------------------------------------------------------------------
 
+use Impressio
 use seleccio_de_potencial
 use Modificacio_De_Select_Pot
 use para_derivnd
@@ -44,6 +45,8 @@ use util1
 use work1
 
 implicit none
+
+Type (info_printout) pr
 
 real (kind=4) :: t0,t1,t2,t3,t4,t5,t6   ! Variables used to printout run time execution.
 
@@ -95,6 +98,7 @@ real       (kind=8)  :: cnorm           !    Normalization constant
 real       (kind=8)  :: pmod1        !    Work variable for controlling p-values
 real       (kind=8)  :: pmod2        !    Work variable for controlling p-values
 real       (kind=8)  :: xcm4,ycm4,zcm4,xcmx,ycmx,zcmx ! Center of mass Drop and Impurity
+real       (kind=8)  :: xcm,ycm,zcm ! Drop Center of mass
 real       (kind=8)  :: distx,disty,distz  ! Distance between center of masses
 real       (kind=8)  :: errHe, errrimp, errvimp, erriv     ! Error evolution (only form Predictor-Corrector-Modificator)
 real       (kind=8)  :: Zsurf = -25.d0, Morse_HeTiO2_1D, Morse_HeTiO2_3D, auxn4 ! Position of the surface
@@ -118,15 +122,20 @@ character  (len=60)  :: filerimp      = 'rimp.out'
 character  (len=60)  :: filevimp      = 'vimp.out'
 character  (len=60)  :: fileaimp      = 'aimp.out'
 character  (len=60)  :: filelambda    = 'lambda.out'
+
 character  (len=60)  :: namefile,namefile1
+
 character  (len=23)  :: curvfile
 character  (len=3)   :: chariter
+
 logical              :: lsurf=.false.        ! include TiO2 surface or not
 logical              :: lsurf3D=.false.        ! include TiO2 surface or not
-real       (kind=8)  :: Lambdah,tzmean,tzsurf,rt
+
+real       (kind=8)  :: Lambdah,tzmean,tzsurf,rt, xlx,xly,xlz
+
 integer              :: i
-integer (kind=4)	 :: nthread   ! Number of threads
-COMPLEX (kind=8)     :: uim = (0.d0,1.d0)
+
+COMPLEX (kind=8)     :: uim = (0.d0,1.d0), ci=(0.d0,1.d0), caux
 
 ! interface
 !   double precision function v_alka(d,elem)
@@ -188,9 +197,9 @@ piq    = pi*pi
 !...............................
 !... Read  master-input file ...
 !...............................
-!Lambdah = 0.d0
-!tzmean   = 0.d0
-!tzsurf   = 1.d0
+Lambdah = 0.d0
+tzmean   = 0.d0
+tzsurf   = 1.d0
 
 read(5,nml=input,end=999)
 open(10,file="DFT4He3d.namelist.read")
@@ -261,6 +270,11 @@ nthread=abs(nthread)
 ! end if
 
 mAg_u = mimpur*mp_u
+
+
+Allocate(pr%psi(nx,ny,nz))
+Allocate(pr%invar(ninvar))
+
 
 hx    = 2.0d0*abs(xmax)/(nx)  ! Step in x-grid
 hy    = 2.0d0*abs(ymax)/(ny)  ! Step in y-grid
@@ -502,8 +516,7 @@ end select
 !... Prepare plans for FFTWs ...
 !...............................
 write(6,*) '    Initialize Plans for FFT.'
-!call fftini(nx,ny,nz)
-call fftini(nx,ny,nz,nthread)
+call fftini(nx,ny,nz)
 
 !...........................................................
 !... Form  factor for Lennard-Jones and for the impurity ...
@@ -765,6 +778,37 @@ write(83,'("# Tiempo(ps), Ax(AA/ps**2), Ay(AA/ps**2), Az(AA/ps**2)")')
 write(83,'(1x,1p,E15.6,3E18.10)')time0, aimp(1)*pstoK*pstoK, aimp(2)*pstoK*pstoK, aimp(3)*pstoK*pstoK
 write(84,'(I10,1p,20E18.10)')iter0, invar
 
+
+pr%ninvar=ninvar
+pr%it0   = iter0
+pr%time0 = time0
+pr%dtps  = deltatps
+pr%nx    = nx
+pr%ny    = ny
+pr%nz    = nz
+pr%hx    = hx
+pr%hy    = hy
+pr%hz    = hz
+pr%xmax  = xmax
+pr%ymax  = ymax
+pr%zmax  = zmax
+pr%selec_gs    = selec_gs
+pr%r_cutoff_gs = r_cutoff_gs
+pr%umax_gs     = umax_gs
+pr%Lstate= Lstate
+pr%selec_pi    = selec_pi
+pr%r_cutoff_pi = r_cutoff_pi
+pr%umax_pi     = umax_pi
+pr%selec_sigma = selec_sigma  
+pr%r_cutoff_sigma = r_cutoff_sigma
+pr%umax_sigma     = umax_sigma
+If(Lstate.Eq.'D')Then
+  pr%selec_delta    = selec_delta
+  pr%r_cutoff_delta = r_cutoff_delta
+  pr%umax_delta     = umax_delta
+EndIf
+
+
 open(11,file='projections.dat')
 
       prodLambda = 0.d0
@@ -782,6 +826,9 @@ iter0=iter0+1
 
 
 do iter=iter0,niter  ! <--------- Iterative procedure starts here.
+  
+
+pr%it = iter
 
 !    Write(6,'("From Main(2)...")')
 !    write(6,'("rimp(1,2,3)..",1p,3e15.6)')rimp
@@ -857,6 +904,89 @@ call flush(83)
 
         call r_cm(den,n4,xcm4,ycm4,zcm4)    ! Center of mass of 4He Drop
         write(6,7100) xcm4,ycm4,zcm4
+
+          xcm = xcm4; ycm=ycm4; zcm=zcm4
+
+          Call derivnD(1,nn,hx,1,psi,sto1c,Icon)
+          Call derivnD(1,nn,hy,2,psi,sto2c,Icon)
+          Call derivnD(1,nn,hz,3,psi,sto3c,Icon)
+!          
+! Z Component of angular momentum 
+!          
+          caux = (0.d0, 0.d0)
+          Do iz=1, nz
+            Do iy=1, ny
+              Do ix=1, nx
+                caux = caux + Ci*Conjg(Psi(ix,iy,iz))*                  &
+                ((y(iy)-ycm)*sto1c(ix,iy,iz) - (x(ix)-xcm)*sto2c(ix,iy,iz)) 
+              EndDo
+            EndDo
+          EndDo
+          xlz = caux*dxyz
+!          
+! Y Component of angular momentum 
+!          
+          caux = (0.d0, 0.d0)
+          Do iz=1, nz
+            Do iy=1, ny
+              Do ix=1, nx
+                caux = caux + Ci*Conjg(Psi(ix,iy,iz))*                  &
+                ((x(ix)-xcm)*sto3c(ix,iy,iz) - (z(iz)-zcm)*sto1c(ix,iy,iz)) 
+              EndDo
+            EndDo
+          EndDo
+          xly = caux*dxyz
+!          
+! X Component of angular momentum 
+!          
+          caux = (0.d0, 0.d0)
+          Do iz=1, nz
+            Do iy=1, ny
+              Do ix=1, nx
+                caux = caux + Ci*Conjg(Psi(ix,iy,iz))*                  &
+                ((z(iz)-zcm)*sto2c(ix,iy,iz) - (y(iy)-ycm)*sto3c(ix,iy,iz)) 
+              EndDo
+            EndDo
+          EndDo
+          caux = caux*dxyz
+          xlx = caux*dxyz
+        Write(6,'("<Lx,Ly,Lz>.......:",1p,3E20.11)')xlx,xly,xlz
+          aux1 = 0.d0
+          aux2 = 0.d0
+          aux3 = 0.d0
+          Do iz=1, nz
+            Do iy=1, ny
+              Do ix=1, nx
+                aux1 = aux1 + den(ix,iy,iz)*x(ix)**2
+                aux2 = aux2 + den(ix,iy,iz)*y(iy)**2
+                aux3 = aux3 + den(ix,iy,iz)*z(iz)**2
+              EndDo
+            EndDo
+          EndDo
+          aux1 = aux1*dxyz
+          aux2 = aux2*dxyz
+          aux3 = aux3*dxyz
+        pr%r2(1)   = aux1
+        pr%r2(2)   = aux2
+        pr%r2(3)   = aux3
+        pr%ang(1)  = xlx
+        pr%ang(2)  = xly
+        pr%ang(3)  = xlz
+        pr%cm(1)   = xcm4
+        pr%cm(2)   = ycm4
+        pr%cm(3)   = zcm4
+        pr%ekin    = ekin4
+        pr%elj     = elj4
+        pr%ealphas = ealphas
+        pr%esolid  = esolid
+        pr%ecor    = ecor4
+        pr%ekinx   = ekinx
+        pr%evx     = eimpu
+        pr%eso     = eso
+        pr%etot    = etot
+        pr%time    = temps
+
+
         write(*,*)'Impurity position:',rimp
         write(*,*)'Impurity velocity:',vimp
 
@@ -876,65 +1006,19 @@ call flush(83)
       write(chariter,8013)ncurr
       end select
       namefile='density.'//chariter//'.dat'
-!        call printoutc(3,namefile,namefile1,psi,elem,nx,ny,nz,hx,hy,hz,limp, &
-!                     xmax,ymax,zmax,ximp,yimp,zimp,psi,         &
-!                     deltat,iter)
-       call printoutc(temps,3,namefile,namefile1,psi,nx,ny,nz,hx,hy,hz, &
-                    xmax,ymax,zmax,rimp,vimp,psi,         &
-                    deltatps,iter,invar,ninvar)
+      pr%namefile = namefile
+      pr%rimp(:) = rimp(:)
+      pr%vimp(:) = vimp(:)
+      pr%psi(:,:,:) = psi(:,:,:)
+      pr%invar(:) = invar(:)
+
+!       call printoutc(temps,3,namefile,namefile1,psi,nx,ny,nz,hx,hy,hz, &
+!                    xmax,ymax,zmax,rimp,vimp,psi,         &
+!                    deltatps,iter,invar,ninvar)
+!
+       call printoutc(pr)     
 
    endif
-
-!    if(mod(iter,pdenpar).eq.0) then        ! Save partial densities
-!      nsfaux = nsfaux+1
-!      nsfaux2= nsfaux2+1 ! The same as nsfaux but not in mod(nsfiles)
-!      if(nsfaux.gt.nsfiles) nsfaux=mod(nsfaux,nsfiles)
-!      select case(nsfaux)
-!          case(1:9)
-!            write(namefile, 8010) nsfaux
-!            write(namefile1,8015) nsfaux
-!          case(10:99)
-!            write(namefile, 8020) nsfaux
-!            write(namefile1,8025) nsfaux
-!          case(100:999)
-!            write(namefile, 8030) nsfaux
-!            write(namefile1,8035) nsfaux
-!      end select
-! 
-! ! Contour plots
-!       select case (nsfaux2)
-!        case(1:9)
-!       write(chariter,8011)nsfaux2
-!        case(10:99)
-!       write(chariter,8012)nsfaux2
-!        case(100:999)
-!       write(chariter,8013)nsfaux2
-!       end select
-! 
-!      curvfile='curvasnivel.y=0.'//chariter//'.dat'
-!      open(74,file=curvfile)
-!      do ix=1,nx
-!        do iz=1,nz
-!          write(74,7109) x(ix),z(iz),den(ix,ny/2+1,iz)!,dene(ix,ny/2+1,iz)
-!        end do
-!        write(74,7119)
-!      Enddo
-!      close(74)
-! 7109 format(T5,0P,2F15.5,3x,1P,1E15.5)
-! 7119 format()
-! 
-!      if(limp) then
-!        if(irespar.ne.0) call respar(x,y,z,nx,ny,nz,2,'folding','foldingx',potx4,upotx)
-!        call printoutc(3,namefile,namefile1,psi,elem,nx,ny,nz,hx,hy,hz,limp, &
-!                     xmax,ymax,zmax,ximp,yimp,zimp,psix,         &
-!                     deltat,iter)
-!      else
-!        call respar(x,y,z,nx,ny,nz,1,'den','den',den,den)
-!        call printoutc(3,namefile,namefile1,psi,elem,nx,ny,nz,hx,hy,hz,limp, &
-!                     xmax,ymax,zmax,ximp,yimp,zimp,psi,         &
-!                     deltat,iter)
-!      end if
-!    end if
 
 !..............................................................................
 
@@ -961,16 +1045,36 @@ call flush(83)
      end select
 
 
-!      if(limp) then
-!         call printoutc(temps,2,namefile,namefile1,psi,elem,nx,ny,nz,hx,hy,hz,limp, &
-!                       xmax,ymax,zmax,ximp,yimp,zimp,psix,                   &
-!                       deltat,iter)
-!      else
-        call printoutc(temps,2,namefile,namefile1,psi,nx,ny,nz,hx,hy,hz, &
-                      xmax,ymax,zmax,rimp,vimp,psi,                   &
-                      deltatps,iter,invar,ninvar)
-!      end if
+!        call printoutc(temps,2,namefile,namefile1,psi,nx,ny,nz,hx,hy,hz, &
+!                      xmax,ymax,zmax,rimp,vimp,psi,                   &
+!                      deltatps,iter,invar,ninvar)
 
+        pr%r2(1)   = aux1
+        pr%r2(2)   = aux2
+        pr%r2(3)   = aux3
+        pr%ang(1)  = xlx
+        pr%ang(2)  = xly
+        pr%ang(3)  = xlz
+        pr%cm(1)   = xcm4
+        pr%cm(2)   = ycm4
+        pr%cm(3)   = zcm4
+        pr%ekin    = ekin4
+        pr%elj     = elj4
+        pr%ealphas = ealphas
+        pr%esolid  = esolid
+        pr%ecor    = ecor4
+        pr%ekinx   = ekinx
+        pr%evx     = eimpu
+        pr%eso     = eso
+        pr%etot    = etot
+        pr%time    = temps
+      pr%namefile = namefile
+      pr%rimp(:) = rimp(:)
+      pr%vimp(:) = vimp(:)
+      pr%psi(:,:,:) = psi(:,:,:)
+      pr%invar(:) = invar(:)
+
+       call printoutc(pr)
 
    end if
 !..............................................................................
@@ -997,9 +1101,35 @@ close(11)
 !                  xmax,ymax,zmax,ximp,yimp,zimp,psix,         &
 !                  deltat,iter)
 ! else
-   call printoutc(temps,1,filedenout,fileimpout,psi,nx,ny,nz,hx,hy,hz, &
-                 xmax,ymax,zmax,rimp,vimp,psi,         &
-                 deltatps,iter,invar,ninvar)
+        pr%r2(1)   = aux1
+        pr%r2(2)   = aux2
+        pr%r2(3)   = aux3
+        pr%ang(1)  = xlx
+        pr%ang(2)  = xly
+        pr%ang(3)  = xlz
+        pr%cm(1)   = xcm4
+        pr%cm(2)   = ycm4
+        pr%cm(3)   = zcm4
+        pr%ekin    = ekin4
+        pr%elj     = elj4
+        pr%ealphas = ealphas
+        pr%esolid  = esolid
+        pr%ecor    = ecor4
+        pr%ekinx   = ekinx
+        pr%evx     = eimpu
+        pr%eso     = eso
+        pr%etot    = etot
+        pr%time    = temps
+      pr%namefile = filedenout
+      pr%rimp(:) = rimp(:)
+      pr%vimp(:) = vimp(:)
+      pr%psi(:,:,:) = psi(:,:,:)
+      pr%invar(:) = invar(:)
+
+       call printoutc(pr)
+!   call printoutc(temps,1,filedenout,fileimpout,psi,nx,ny,nz,hx,hy,hz, &
+!                 xmax,ymax,zmax,rimp,vimp,psi,         &
+!                 deltatps,iter,invar,ninvar)
 ! end if
 
 call timer(t4)

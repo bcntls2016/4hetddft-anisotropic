@@ -86,10 +86,8 @@ select case(core4)
      continue
 end select
 
-!....................!
-!... penalty term ...!
-!....................!
-esolid = C*sum(den*(1.d0+dtanh(beta*(den-den_m))))*dxyz
+esolid=0.0d0
+if(lsolid)esolid = C*sum(den*(1.d0+dtanh(beta*(den-den_m))))*dxyz
 
 ekin4 = h2o2m4*ekin4*dxyz           ! TOTAL Kinetic energy for 4He
 elj4  = 0.5d0 *elj4 *dxyz           ! TOTAL Lennard-Jones energy

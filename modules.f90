@@ -1,3 +1,29 @@
+
+Module Impressio
+
+Type, Public  :: info_printout
+  Integer   (Kind=4) :: it, it0, nx, ny, nz, ninvar
+  Complex   (Kind=8), Allocatable :: psi(:,:,:), invar(:)
+  Character (len=60) :: namefile
+  Real      (Kind=8) :: r2(3), cm(3), ang(3), rimp(3), vimp(3), dtps, Ekin, Elj, Ecor
+  Real      (Kind=8) :: Ealphas, Esolid, Ekinx, EVx, Eso, Etot
+  Real      (Kind=8) :: Time0, Time, hx, hy, hz, xmax, ymax, zmax
+  Character (len=1)  :: Lstate
+  Character (Len=80) :: selec_gs
+  Real      (Kind=8) :: r_cutoff_gs
+  Real      (Kind=8) :: umax_gs
+  Character (Len=80) :: selec_pi
+  Real      (Kind=8) :: r_cutoff_pi
+  Real      (Kind=8) :: umax_pi
+  Character (Len=80) :: selec_sigma
+  Real      (Kind=8) :: r_cutoff_sigma
+  Real      (Kind=8) :: umax_sigma
+  Character (Len=80) :: selec_delta
+  Real      (Kind=8) :: r_cutoff_delta
+  Real      (Kind=8) :: umax_delta
+End type info_printout
+
+End Module Impressio        
 !------------------------------------------------------------------
 !---                    MODULES                                 ---
 !------------------------------------------------------------------
@@ -12,11 +38,11 @@ real    (kind=8) , allocatable  :: ualphas(:,:,:)  ! Piece of field due to the a
 end module alphasterm
 !------------------------------------------------------------------
 module deriva
-integer (kind=4)              :: npd=13             ! Number of points for derivatives
+integer (kind=4)              :: npd=7             ! Number of points for derivatives
 real    (kind=8), allocatable :: dxden(:,:,:)      ! Partial derivative in X for den in Real-space
 real    (kind=8), allocatable :: dyden(:,:,:)      ! Partial derivative in X for den in Real-space
 real    (kind=8), allocatable :: dzden(:,:,:)      ! Partial derivative in X for den in Real-space
-integer (kind=4)              :: icon=13            ! Bounday conditions for derivatives
+integer (kind=4)              :: icon=8            ! Bounday conditions for derivatives
 end module deriva
 !------------------------------------------------------------------
 module energies
@@ -45,7 +71,7 @@ end module field
 !------------------------------------------------------------------
 module fftmodule
 
-character (len=15)            :: fftwplan="FFTW_PATIENT"
+character (len=15)            :: fftwplan="FFTW_ESTIMATE"
 ! real    (kind=8), allocatable :: fin(:,:,:)  ! Work Array for FFT 
 ! complex (kind=8), allocatable :: fout(:,:,:) ! Work Array for FFT 
 ! integer (kind=8)              :: pfftfw      ! Pointer for FFT forward
@@ -62,7 +88,7 @@ integer (kind=8)              :: pfftbk_1    ! Pointer for FFT bakward
 integer (kind=8)              :: pfftbk_1x   ! Pointer for FFT bakward
 integer (kind=8)              :: pfftbk_2y   ! Pointer for FFT bakward
 integer (kind=8)              :: pfftbk_3z   ! Pointer for FFT bakward
-!integer (kind=4)              :: nthread=1   ! Number of threads
+integer (kind=4)              :: nthread=1   ! Number of threads
 integer (kind=4)              :: npx,npy,npz ! Number of of points (axis)
 real    (kind=8)              :: renor       ! Inverse of (nx*ny*nz)
 end module fftmodule
@@ -127,6 +153,7 @@ real      (kind=8)               :: alphas= 54.31d0         ! K ^-1 \AA**3
 real      (kind=8)               ::      l= 1.0d0           ! \AA
 real      (kind=8)               ::  den0s= 0.04d0          ! \AA**-3
 real      (kind=8)               :: h2o2m4= 6.05969638298d0 ! \hbar**2 / (2 m_4)
+logical                          :: lsolid=.true. ! To execute with the solid functional
 real      (kind=8)               :: C = 3.1577504d4
 real      (kind=8)               :: beta= 40.d0
 real      (kind=8)               :: den_m = 0.37d0
@@ -225,7 +252,7 @@ real      (kind=8) :: vdt(2)     ! Speeds for imaginary step-time method.
 integer   (kind=4) :: nn(3)      ! Auxiliar array for pderg
 integer   (kind=4) :: mmx(4)     ! Auxiliar array for pderg
 integer   (kind=4) :: iw(11)     ! Auxiliar array for pderg
-integer   (kind=4) :: nsfiles=1 ! Number-of-save-files
+integer   (kind=4) :: nsfiles=10 ! Number-of-save-files
 integer   (kind=4) :: nsfaux=0   ! Actual generation of backup file
 integer   (kind=4) :: nsfaux2=0   ! Actual generation of backup file
 integer   (kind=4) :: irespar=0  ! Does not write partial auxiliar plot files...

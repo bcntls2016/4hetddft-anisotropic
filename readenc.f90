@@ -56,7 +56,7 @@ real      (kind=8) :: aux1b,aux2b,aux3b,vls
 
 integer   (kind=4) :: nxp,nyp,nzp,nninvar0
 integer   (kind=4) :: ix,iy,iz,isalto
-logical :: limp
+logical :: limp,Ldensity=.true.
 real      (kind=8) :: rr
 
 real      (kind=8) :: Uzr ! Convolution of rho with (V_zz - V_rr)
@@ -86,9 +86,22 @@ select case(mode)
 !-------------------------------------------------------------------
 
      open(unit=1,file=fileden,status='old')
+     Go to 20
+10   Continue
+       Ldensity=.false.
+20   Continue
+     Rewind(1)
      call titols(1,cchar,isalto)
      read(1,*) xmaxp,ymaxp,zmaxp,hxp,hyp,hzp,nxp,nyp,nzp,limp,ximp,yimp,zimp
-     read(1,*) den
+     If(Ldensity)Then
+       read(1,*,Err=10) den
+       Write(6,'("From Readenc: We have read a density")')
+     Else
+       read(1,*)psi
+       Write(6,'("From Readenc: We have read a complex w.f.")')
+       den=Abs(psi)**2
+     Endif
+
      close(1)
  
       rimp = (/ximp,yimp,zimp/)

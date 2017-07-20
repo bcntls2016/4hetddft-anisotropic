@@ -77,8 +77,10 @@ call fftbk_1()
 !... Solid penalty term ...
 !..........................
 
-penalty = tanh(beta*(den-den_m))
-penalty = C*(1.d0 + penalty + beta*den*(1.d0 - penalty**2) )
+If(lsolid)Then
+  penalty = dtanh(beta*(den-den_m))
+  penalty = C*(1.d0 + penalty + beta*den*(1.d0 - penalty**2) )
+Endif
 
 !.......................
 !.. Final 'Potential' ...
@@ -119,12 +121,12 @@ end if
 !    end forall 
 ! end if
 
-   forall(ix=1:nx,iy=1:ny,iz=1:nz)
-!      pot4(ix,iy,iz) = pot4(ix,iy,iz) + uimp(ix,iy,iz) + penalty(ix,iy,iz)
-      pot4(ix,iy,iz) = pot4(ix,iy,iz) + penalty(ix,iy,iz)
-
-    end forall 
  
+If(lsolid)Then
+  forall(ix=1:nx,iy=1:ny,iz=1:nz)
+    pot4(ix,iy,iz) = pot4(ix,iy,iz) + penalty(ix,iy,iz)
+  end forall 
+Endif
 
 return
 

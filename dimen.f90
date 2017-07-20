@@ -66,7 +66,7 @@ allocate ( wcgk(nx/2+1,ny,nz))    ! Array with the kernel of the coarse-graining
 !..............................
 !
    allocate( uext(nx,ny,nz));     uext = 0.0d0      ! Fourier transform of the impurity external potential
-   allocate(penalty(nx,ny,nz));   penalty = 0.0d0      ! Fourier transform of the impurity external potential
+   If(Lsolid)allocate(penalty(nx,ny,nz));   penalty = 0.0d0      ! For the solid functional
    allocate( uimp(nx,ny,nz));     uimp = 0.0d0      ! Fourier transform of the impurity external potential
    allocate( uHe_He(nx,ny,nz));   uHe_He = 0.0d0    ! He-He interaction when we filter the exciplex part of the Helium density
    allocate(invar(ninvar));       invar = (0.0d0,0.0d0)
