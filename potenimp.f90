@@ -223,7 +223,7 @@ If(Lfilter_exciplex_force)Then
       Do iy=1,ny
         Do ix=1,nx
           aux1 =aux1 + dzden(ix,iy,iz)*uimp(ix,iy,iz)
-          aux2 =aux2 + dzden(ix,iy,iz)*uHe_He(ix,iy,iz)
+!          aux2 =aux2 + dzden(ix,iy,iz)*uHe_He(ix,iy,iz)
         EndDo  
       EndDo  
     EndDo
@@ -236,7 +236,7 @@ If(Lfilter_exciplex_force)Then
       Do iy=1,ny
         Do ix=1,nx
           aux1 =aux1 + dzden(ix,iy,iz)*uimp(ix,iy,iz)
-          aux2 =aux2 + dzden(ix,iy,iz)*uHe_He(ix,iy,iz)
+ !         aux2 =aux2 + dzden(ix,iy,iz)*uHe_He(ix,iy,iz)
         EndDo  
       EndDo  
     EndDo
